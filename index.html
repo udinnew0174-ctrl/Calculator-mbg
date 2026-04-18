@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Kalkulator MBG - Simulasi Dana</title>
+  <meta name="description" content="Simulasi sederhana daya tahan dana berdasarkan kalkulasi Makan Bergizi Gratis." />
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            }
+          },
+          animation: {
+            'marquee': 'marquee 25s linear infinite',
+            'bounce-soft': 'bounceSoft 2s infinite ease-in-out',
+          },
+          keyframes: {
+            marquee: {
+              '0%': { transform: 'translateX(100%)' },
+              '100%': { transform: 'translateX(-100%)' },
+            },
+            bounceSoft: {
+              '0%, 100%': { transform: 'translateY(-5%)' },
+              '50%': { transform: 'translateY(0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar for horizontal lists */
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    
+    /* Smooth transition for inputs */
+    input:focus { outline: none; }
+    
+    body {
+      background-color: #f8fafc;
+      background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    /* Slideshow Animation Banner (4 Gambar) */
+    .slide-bg {
+      opacity: 0;
+      animation: slide 16s infinite ease-in-out;
+      will-change: transform, opacity;
+    }
+    .slide-bg:nth-child(1) { animation-delay: 0s; }
+    .slide-bg:nth-child(2) { animation-delay: 4s; }
+    .slide-bg:nth-child(3) { animation-delay: 8s; }
+    .slide-bg:nth-child(4) { animation-delay: 12s; }
+
+    @keyframes slide {
+      0% { opacity: 0; transform: scale(1); }
+      5% { opacity: 1; transform: scale(1.02); }
+      25% { opacity: 1; transform: scale(1.05); }
+      30% { opacity: 0; transform: scale(1.06); }
+      100% { opacity: 0; transform: scale(1); }
+    }
+
+    /* Icon Hover Effect - hanya untuk WA & IG yang tersisa */
+    .social-icon {
+      fill: #64748b;
+      transition: all 0.2s ease-in-out;
+    }
+    .social-icon:hover {
+      fill: #0ea5e9;
+      transform: scale(1.15) translateY(-2px);
+    }
+    
+    /* Sentuhan modern: gradient tombol & shadow halus */
+    .btn-modern {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      transition: all 0.2s ease;
+    }
+    .btn-modern:hover {
+      background: linear-gradient(135deg, #0369a1, #075985);
+      transform: scale(0.98);
+    }
+    .card-glass {
+      backdrop-filter: blur(16px);
+      background-color: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col selection:bg-brand-200">
+
+  <!-- Running Text / Marquee -->
+  <div class="bg-brand-600 text-white overflow-hidden py-1.5 md:py-2 shadow-md relative z-30">
+    <div class="whitespace-nowrap animate-marquee text-[11px] md:text-sm font-semibold flex gap-6 md:gap-8 items-center">
+      <span>💸 INFO PENTING: Pengeluaran MBG per hari estimasi mencapai Rp 319,6 Miliar!</span>
+      <span>•</span>
+      <span>🍗 1 Porsi diasumsikan seharga Rp 15.000</span>
+      <span>•</span>
+      <span>🤔 Coba masukin gaji kamu, tahan berapa detik buat ngasih makan senegara?</span>
+    </div>
+  </div>
+
+  <!-- Hero Banner dengan Blur (Tinggi Diperbaiki & Jarak Aman ke Bawah) -->
+  <div class="relative w-full min-h-[280px] md:min-h-[380px] flex flex-col items-center justify-center overflow-hidden z-10 pb-12 md:pb-16">
+    
+    <!-- Slider Backgrounds (4 Gambar) -->
+    <div class="absolute inset-0 bg-cover bg-center slide-bg" style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCvfv9KamwNGPGMb01yDZ_Ssqs3s5JBpitBBrLp_U_jw&s=10');"></div>
+    <div class="absolute inset-0 bg-cover bg-center slide-bg" style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUrxh56sQP0HIvkGX3-zTGuiNtmGJZ7d-S9sT8KYQO9w&s=10');"></div>
+    <div class="absolute inset-0 bg-cover bg-center slide-bg" style="background-image: url('https://img.antarafoto.com/cache/1200x799/2025/01/06/pelaksanaan-program-mbg-di-sidoarjo-1fs8e-dom.jpg');"></div>
+    <div class="absolute inset-0 bg-cover bg-center slide-bg" style="background-image: url('https://sma1jekulo.sch.id/wp-content/uploads/2025/08/40-1-1100x600.jpg');"></div>
+    
+    <!-- Efek Blur Khusus Separuh Bawah (Makin ke atas makin pudar blurnya) -->
+    <div class="absolute bottom-0 inset-x-0 h-[45%] backdrop-blur-md pointer-events-none" style="-webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 5%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(to top, rgba(0,0,0,1) 5%, rgba(0,0,0,0) 100%);"></div>
+
+    <!-- Transisi Warna ke Background Body (Biar menyatu dan gak patah) -->
+    <div class="absolute bottom-0 inset-x-0 h-[35%] bg-gradient-to-t from-[#f8fafc] to-transparent pointer-events-none"></div>
+
+    <!-- Overlay Gelap Tipis (Biar teks tetep gampang dibaca walau foto terang) -->
+    <div class="absolute inset-0 bg-black/10 pointer-events-none"></div>
+    
+    <header class="relative z-20 text-center px-4 max-w-2xl mx-auto mt-6 md:mt-4">
+      <div class="inline-block bg-white/80 backdrop-blur-sm text-brand-700 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold tracking-wider mb-2.5 md:mb-4 shadow-sm border border-brand-200">
+        KALKULATOR MBG
+      </div>
+      <div class="bg-brand-600 text-white rounded-2xl md:rounded-3xl p-4 md:p-8 shadow-xl md:shadow-2xl mb-3 md:mb-4 transform -rotate-1 hover:rotate-0 transition-all duration-300 border-2 md:border-4 border-white/20">
+        <h1 class="text-2xl md:text-5xl font-extrabold tracking-tight leading-tight drop-shadow-md">
+          Uang segini,<br/>cukup sampai kapan?
+        </h1>
+      </div>
+      <p class="text-slate-800 font-semibold text-xs md:text-base drop-shadow-sm bg-white/60 inline-block px-4 py-2 md:px-5 md:py-2.5 rounded-xl md:rounded-2xl backdrop-blur-md border border-white/40">
+        Simulasi daya tahan dana pribadimu jika dipakai buat nombokin biaya Makan Bergizi Gratis 🇮🇩
+      </p>
+    </header>
+  </div>
+
+  <!-- Main Container (Mengurangi tumpang tindih / negative margin) -->
+  <main class="flex-grow container mx-auto px-4 max-w-2xl -mt-6 md:-mt-12 relative z-20">
+    
+    <!-- Main Card Input (lebih modern dengan glassmorphism) -->
+    <section class="card-glass rounded-2xl md:rounded-3xl shadow-xl shadow-brand-900/10 p-4 md:p-8 relative z-20 transition-all duration-300">
+      <label for="uang" class="block text-[11px] md:text-sm font-bold text-slate-700 mb-2">Masukkan nominal dana lu (Rp)</label>
+      <div class="relative flex items-center bg-white/70 border border-slate-200/80 rounded-xl md:rounded-2xl focus-within:border-brand-500 focus-within:bg-white transition-all duration-200 overflow-hidden shadow-sm">
+        <span class="pl-3 md:pl-4 font-bold text-slate-400 select-none text-sm md:text-base">Rp</span>
+        <input 
+          id="uang" 
+          type="text" 
+          inputmode="numeric" 
+          placeholder="Contoh: 10000000" 
+          autocomplete="off"
+          class="w-full py-2 md:py-4 px-2 md:px-3 bg-transparent text-lg md:text-2xl font-bold text-slate-800 placeholder-slate-300"
+        />
+        <button id="hitungBtn" class="btn-modern text-white font-bold py-2 px-4 md:py-4 md:px-6 transition-all duration-200 active:scale-95 text-[13px] md:text-base shadow-md">
+          Hitung!
+        </button>
+      </div>
+
+      <!-- Satire / Meme Message (Dynamic) -->
+      <div id="satireBox" class="hidden mt-4 p-3 md:p-4 rounded-xl text-xs md:text-sm font-semibold text-center transition-all duration-300 transform scale-95 opacity-0">
+        <!-- Text injected via JS -->
+      </div>
+    </section>
+
+    <!-- Teks Titipan Wowo -->
+    <div class="text-center mt-4 text-[11px] md:text-xs font-bold text-slate-500/80 bg-white/50 backdrop-blur-sm py-2 px-4 rounded-full inline-block mx-auto border border-slate-200/50 shadow-sm relative left-1/2 -translate-x-1/2">
+      🗣️ : "Kasih tau Wowo, makasih dah buatinkan eM Be gE"
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="mt-4 md:mt-6 text-center text-slate-400 py-6 md:py-10">
+      <div class="text-3xl md:text-4xl mb-2 md:mb-3 animate-bounce-soft">👆</div>
+      <p class="text-xs md:text-sm font-medium">Masukin duitnya dulu di atas, nanti simulasinya muncul di sini.</p>
+    </div>
+
+    <!-- Results Area -->
+    <div id="hasilWrapper" class="hidden mt-4 md:mt-6 space-y-3 md:space-y-4">
+      
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-2 gap-2 md:gap-4">
+        <div class="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-xl md:rounded-2xl p-3 md:p-4 shadow-sm">
+          <p class="text-[10px] md:text-xs text-slate-500 font-medium mb-0.5 md:mb-1">Setara Porsi Makan</p>
+          <p id="outPorsi" class="text-base md:text-xl font-extrabold text-slate-800">-</p>
+        </div>
+        <div class="bg-brand-50/80 backdrop-blur-sm border border-brand-100/60 rounded-xl md:rounded-2xl p-3 md:p-4 shadow-sm">
+          <p class="text-[10px] md:text-xs text-brand-600 font-medium mb-0.5 md:mb-1">Laju Pengeluaran</p>
+          <p class="text-base md:text-xl font-extrabold text-brand-700">~Rp 319,6 M/hari</p>
+        </div>
+      </div>
+
+      <!-- Durasi Bertahan -->
+      <div class="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm">
+        <h2 class="text-xs md:text-sm font-bold text-slate-800 mb-2 md:mb-3 flex items-center gap-2">⏳ Durasi Bertahan Buat Senegara</h2>
+        <div class="grid grid-cols-3 md:grid-cols-6 gap-2 text-center">
+          <div class="bg-slate-50/70 rounded-lg md:rounded-xl py-1.5 md:py-2 border border-slate-100/80"><span id="durTahun" class="block font-bold text-base md:text-lg text-slate-800">0</span><span class="text-[9px] md:text-[10px] text-slate-500 uppercase tracking-wide">Tahun</span></div>
+          <div class="bg-slate-50/70 rounded-lg md:rounded-xl py-1.5 md:py-2 border border-slate-100/80"><span id="durBulan" class="block font-bold text-base md:text-lg text-slate-800">0</span><span class="text-[9px] md:text-[10px] text-slate-500 uppercase tracking-wide">Bulan</span></div>
+          <div class="bg-slate-50/70 rounded-lg md:rounded-xl py-1.5 md:py-2 border border-slate-100/80"><span id="durHari" class="block font-bold text-base md:text-lg text-slate-800">0</span><span class="text-[9px] md:text-[10px] text-slate-500 uppercase tracking-wide">Hari</span></div>
+          <div class="bg-slate-50/70 rounded-lg md:rounded-xl py-1.5 md:py-2 border border-slate-100/80"><span id="durJam" class="block font-bold text-base md:text-lg text-slate-800">0</span><span class="text-[9px] md:text-[10px] text-slate-500 uppercase tracking-wide">Jam</span></div>
+          <div class="bg-slate-50/70 rounded-lg md:rounded-xl py-1.5 md:py-2 border border-slate-100/80"><span id="durMenit" class="block font-bold text-base md:text-lg text-slate-800">0</span><span class="text-[9px] md:text-[10px] text-slate-500 uppercase tracking-wide">Menit</span></div>
+          <div class="bg-slate-50/70 rounded-lg md:rounded-xl py-1.5 md:py-2 border border-slate-100/80"><span id="durDetik" class="block font-bold text-base md:text-lg text-brand-600">0</span><span class="text-[9px] md:text-[10px] text-brand-500 uppercase tracking-wide">Detik</span></div>
+        </div>
+      </div>
+
+      <!-- Komparasi Gaji Indo -->
+      <div class="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm">
+        <h2 class="text-xs md:text-sm font-bold text-slate-800 mb-2 md:mb-3">🇮🇩 Uang lu jika dibanding Gaji Lokal</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-3">
+          <div class="flex justify-between items-center md:block bg-slate-50/70 p-2.5 md:p-3 rounded-lg md:rounded-xl">
+            <div class="md:mb-2">
+              <span class="block text-[10px] md:text-xs text-slate-500">UMR Jakarta</span>
+              <span class="block text-xs md:text-sm font-bold">Rp 5,4 Jt</span>
+            </div>
+            <div id="gajiDki" class="text-xs md:text-sm font-extrabold text-brand-600 bg-brand-100/80 px-2 py-1 rounded-md md:rounded-lg">-</div>
+          </div>
+          <div class="flex justify-between items-center md:block bg-slate-50/70 p-2.5 md:p-3 rounded-lg md:rounded-xl">
+            <div class="md:mb-2">
+              <span class="block text-[10px] md:text-xs text-slate-500">UMR Jateng</span>
+              <span class="block text-xs md:text-sm font-bold">Rp 2,04 Jt</span>
+            </div>
+            <div id="gajiJateng" class="text-xs md:text-sm font-extrabold text-brand-600 bg-brand-100/80 px-2 py-1 rounded-md md:rounded-lg">-</div>
+          </div>
+          <div class="flex justify-between items-center md:block bg-red-50/80 border border-red-100/80 p-2.5 md:p-3 rounded-lg md:rounded-xl">
+            <div class="md:mb-2">
+              <span class="block text-[10px] md:text-xs text-red-400">Guru Honorer 😢</span>
+              <span class="block text-xs md:text-sm font-bold text-red-700">Rp 300 Rb</span>
+            </div>
+            <div id="gajiGuru" class="text-xs md:text-sm font-extrabold text-red-600 bg-red-100/80 px-2 py-1 rounded-md md:rounded-lg">-</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Komparasi Gaji Pemain Bola -->
+      <div class="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm">
+        <h2 class="text-xs md:text-sm font-bold text-slate-800 mb-1">⚽ Uang lu vs Gaji Tahunan Atlet (Geser 👉)</h2>
+        <p class="text-[10px] md:text-xs text-slate-500 mb-2 md:mb-3">Persentase uang lu dibanding kontrak triliunan mereka.</p>
+        
+        <div class="flex gap-2 md:gap-3 overflow-x-auto hide-scrollbar pb-2 snap-x" id="playersList">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer Identitas & Social Media (Hanya WA & IG, TT & TELE dihapus) -->
+  <footer class="mt-12 mb-8 text-center pb-6">
+    <div class="flex justify-center items-center gap-5 mb-4">
+      <!-- WhatsApp dengan nomor baru -->
+      <a href="https://wa.me/6282358900198" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+        <svg class="social-icon w-6 h-6" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      </a>
+      <!-- Instagram dengan akun baru -->
+      <a href="https://instagram.com/ahmadsyi_" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+        <svg class="social-icon w-6 h-6" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </a>
+    </div>
+    <div class="text-xs text-slate-500 font-medium mb-1 flex items-center justify-center gap-2">
+      Dev By udins
+      <!-- Gambar profil dev diganti sesuai permintaan -->
+      <img src="https://i.ibb.co.com/Kpbsgc6B/62-823-5890-0198-20260418-181110.jpg" alt="Dev Icon" class="w-5 h-5 rounded-full object-cover border border-slate-300 shadow-sm" />
+    </div>
+  </footer>
+
+  <!-- Script Logic (Sama seperti sebelumnya, tidak diubah) -->
+  <script>
+    const PENGELUARAN_PER_HARI = 319600000000; // Rp 319.6 Miliar
+    const HARGA_PORSI = 15000;
+
+    const PEMAIN = [
+      { nama: 'C. Ronaldo', gaji: 4500000000000, logo: '🇵🇹' },
+      { nama: 'L. Messi', gaji: 2100000000000, logo: '🇦🇷' },
+      { nama: 'K. Benzema', gaji: 1700000000000, logo: '🇫🇷' },
+      { nama: 'K. Mbappé', gaji: 1500000000000, logo: '🇫🇷' },
+      { nama: 'E. Haaland', gaji: 1300000000000, logo: '🇳🇴' },
+      { nama: 'Vinícius Jr.', gaji: 960000000000, logo: '🇧🇷' }
+    ];
+
+    function hitungMBGWeb(uang) {
+      const hariFloat = uang / PENGELUARAN_PER_HARI;
+
+      const tahun = Math.floor(hariFloat / 365);
+      const sisaHariSetelahTahun = hariFloat - tahun * 365;
+      const bulan = Math.floor(sisaHariSetelahTahun / 30);
+      const sisaHari = sisaHariSetelahTahun - bulan * 30;
+      const hari = Math.floor(sisaHari);
+
+      const jamFloat = (sisaHari - hari) * 24;
+      const jam = Math.floor(jamFloat);
+      const menitFloat = (jamFloat - jam) * 60;
+      const menit = Math.floor(menitFloat);
+      const detik = ((menitFloat - menit) * 60).toFixed(2);
+
+      const porsi = Math.floor(uang / HARGA_PORSI);
+      const persenDKI = ((uang / 5400000) * 100).toFixed(2) + '%';
+      const persenJateng = ((uang / 2040000) * 100).toFixed(2) + '%';
+      const kaliGuru = (uang / 300000).toLocaleString('id-ID') + 'x lipat';
+
+      const pemain = PEMAIN.map((p) => {
+        const persen = (uang / p.gaji) * 100;
+        return {
+          ...p,
+          persen: persen < 0.0001 ? '< 0.0001%' : persen.toFixed(4) + '%'
+        };
+      });
+
+      return {
+        durasi: { tahun, bulan, hari, jam, menit, detik },
+        porsi,
+        gajiIndonesia: { dki: persenDKI, jateng: persenJateng, guru: kaliGuru },
+        pemain
+      };
+    }
+
+    function formatRupiahSingkat(angka) {
+      if(angka >= 1e12) return (angka / 1e12).toFixed(1) + ' Triliun';
+      if(angka >= 1e9) return (angka / 1e9).toFixed(1) + ' Miliar';
+      if(angka >= 1e6) return (angka / 1e6).toFixed(1) + ' Juta';
+      return angka.toLocaleString('id-ID');
+    }
+
+    // AI TONGKRONGAN: Logic Roasting Satir Bahasa Gaul (5 Random Responses per tier)
+    function getRandomMsg(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function getSatireMeme(uang) {
+      let options = [];
+      let cls = "";
+
+      if (uang < 15000) {
+        cls = "bg-red-100 text-red-700";
+        options = [
+          "Ngasih makan siapa lu pake duit segini? Mending beli cilok ngab. 🗿",
+          "Duit segini mah buat bayar parkir indomaret doang bang. 😭",
+          "Mending buat beli teh pucuk aja ngab, gausah sok mikirin negara. 🥤",
+          "Kasian banget dompet lu bang, mending puasa aja dah. 💀",
+          "Duit segini dapet porsi apaan woy? Kuah doang? 😹"
+        ];
+      } else if (uang < 50000) {
+        cls = "bg-orange-100 text-orange-800";
+        options = [
+          "Duit segini mah buat nongkrong warkop aja ludes bang. ☕",
+          "Mending pesen nasgor depan gang aja lu sana. 🍛",
+          "Baru gajian apa gimana nih? Segini doang? 🤣",
+          "Buat beli kuota sebulan aja masih ngos-ngosan lu bang. 📶",
+          "Segini mah buat jajan mixue juga abis ngab. 🍦"
+        ];
+      } else if (uang < 100000) {
+        cls = "bg-yellow-100 text-yellow-800";
+        options = [
+          "Mending jalan ama cewek lu sana pake duit segini. 😹",
+          "Duit cepek doang belagu mau ngasih makan negara. 🗿",
+          "Nanggung amat bang duit lu, buat mabar warnet aja sono. 🎮",
+          "Buat beli seblak prasmanan berdua ama ayang pas nih. 🍲",
+          "Segini doang? Tarik tunai bca aja minimal 50 rebu bang! 🏧"
+        ];
+      } else if (uang < 500000) {
+        cls = "bg-green-100 text-green-800";
+        options = [
+          "Bisa lah buat traktir ayang nonton bioskop, ngapain mikirin negara? 🍿",
+          "Cair nih yee, mending buat check out kranjang oren ngab. 🛒",
+          "Duit segini baru kerasa dikit, tapi buat MBG mah gaada se-upil. 🤏",
+          "Gas healing tipis-tipis bang, gausah ngurusin APBN. 🛵",
+          "Sultan nanggung lu, mending beliin emak lu martabak dah. 🥞"
+        ];
+      } else if (uang < 1000000) {
+        cls = "bg-teal-100 text-teal-800";
+        options = [
+          "Lumayan nih buat nambahin cicilan mbit bulanan lu ngab. 🏍️",
+          "Udah ngerasa kaya pegang duit sejuta? Masih kere di mata negara bro. 😭",
+          "Mending buat upgrade spek pc lu bang, ngapain buat negara. 🖥️",
+          "Bisa nih buat staycation murah, daripada mikirin gizi orang. 🏨",
+          "Duit lu sejuta tapi utang pinjol lu lima juta kan? Ngaku lu! 🏃‍♂️💨"
+        ];
+      } else if (uang < 5000000) {
+        cls = "bg-blue-100 text-blue-800";
+        options = [
+          "Gaji lu sebulan doang ini mah, mending tabungin buat modal nikah. 💍",
+          "Duit UMR lu jangan disumbangin semua ngab, inget kosan belom bayar. 🏠",
+          "Segini mah abis buat nongkrong senopati semalem doang bang. 🥂",
+          "Wih UMR jakarta nih? Tapi tetep aja ngab, setetes doang buat MBG. 💧",
+          "Bisa beli iphone bekas nih, mending flexing dulu aja ngab. 📱"
+        ];
+      } else if (uang < 50000000) {
+        cls = "bg-indigo-100 text-indigo-800";
+        options = [
+          "Wih udah bisa DP mobil nih bosku, tapi buat nombokin negara mah kaga nyisa sedetik. 🚗",
+          "Duit segini mending buat umrohin ortu lu ngab, dapet pahala. 🕋",
+          "Cair warisan lu bang? Buat buka warkop aja mendingan. ☕",
+          "Pegang puluhan juta juga sedetik doang ludes buat MBG bang, mending buat lu aja. 😭",
+          "Gaya lu selangit pegang segini, mending bayar utang temen lu dulu! 😤"
+        ];
+      } else if (uang < 1000000000) {
+        cls = "bg-purple-100 text-purple-800";
+        options = [
+          "Orang kaya gabut ya lu nyasar ke kalkulator ginian? 🤑",
+          "Punya ratusan juta mending lu beli rumah KPR bang, gausah mikirin negara. 🏡",
+          "Ini duit hasil nge-pet apa crypto bang? Mending invest aja dah. 📈",
+          "Anjay sultan, tapi tetep aja kureng buat biayain MBG sehari. 🤏",
+          "Buset, bagi gope napa bang buat beli es campur! 🍧"
+        ];
+      } else if (uang < 100000000000) {
+        cls = "bg-fuchsia-100 text-fuchsia-800";
+        options = [
+          "Anjay sultan beneran, duit segini mending lu bagi-bagi thr ke follower lu aja dah. 💸",
+          "Lu rafathar nyamar pake akun palsu ya? Ngaku lu! 🧐",
+          "Uang milyaran gini mending lu beli tim esport aja bang. 🎮",
+          "Gila lu punya miliaran? Mending lu nyalonin bupati aja sekalian. 👔",
+          "Duit lu banyak amat, tapi tetep nggak cukup buat ngasih makan senegara sehari. 🙃"
+        ];
+      } else if (uang < 319600000000) {
+        cls = "bg-rose-100 text-rose-800";
+        options = [
+          "Gila duit lu ratusan miliar, tapi sedih bang masih kurang buat nombokin MBG sehari. 🥲",
+          "Duit lu nyaris bisa biayain MBG sehari nih, kurang dikit ngutang pinjol dulu bang! 🤣",
+          "Lu yang punya pabrik djarum apa gimana nih? Duit kaga abis-abis. 🚬",
+          "Konglomerat mana lu? Duit segini mending bikin negara sendiri bang. 🏴‍☠️",
+          "Uang lu setara APBD kabupaten, tapi buat makan senegara sehari aja tekor. 💀"
+        ];
+      } else {
+        cls = "bg-brand-100 text-brand-800 border border-brand-300";
+        options = [
+          "Buset lu korupsi di mana ngab? Duit segini ngalahin APBD anjir! 😱🚓",
+          "Lu admin judol apa gimana bang pegang duit segini? Ditangkep reskrim lu ntar! 🚔",
+          "Fix lu bandar! Pegang duit triliunan gabut amat main kalkulator ginian. 🤡",
+          "Uang lu nyisa banyak banget, mending lunasin utang negara sekalian bang! 🇮🇩",
+          "Ampun bang jago! Ini duit asli apa duit monopoli banyak bener? 🎲"
+        ];
+      }
+
+      return { msg: getRandomMsg(options), cls: cls };
+    }
+
+    function formatInputValue(value) {
+      const numericOnly = value.replace(/[^0-9]/g, '');
+      return numericOnly ? Number(numericOnly).toLocaleString('id-ID') : '';
+    }
+
+    const uangInput = document.getElementById('uang');
+    const hitungBtn = document.getElementById('hitungBtn');
+    const hasilWrapper = document.getElementById('hasilWrapper');
+    const emptyState = document.getElementById('emptyState');
+    const playersList = document.getElementById('playersList');
+    const satireBox = document.getElementById('satireBox');
+
+    // Input masking for currency
+    uangInput.addEventListener('input', (event) => {
+      const start = event.target.selectionStart;
+      const beforeLength = event.target.value.length;
+      event.target.value = formatInputValue(event.target.value);
+      const afterLength = event.target.value.length;
+      const nextPos = Math.max(0, start + (afterLength - beforeLength));
+      event.target.setSelectionRange(nextPos, nextPos);
+    });
+
+    uangInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') hitung();
+    });
+
+    hitungBtn.addEventListener('click', hitung);
+
+    function hitung() {
+      const rawVal = uangInput.value.replace(/[^0-9]/g, '');
+      const uang = Number(rawVal);
+
+      if (!uang) {
+        uangInput.classList.add('border-red-400', 'animate-pulse');
+        setTimeout(() => uangInput.classList.remove('border-red-400', 'animate-pulse'), 1000);
+        return;
+      }
+
+      const data = hitungMBGWeb(uang);
+
+      // Handle UI State
+      emptyState.classList.add('hidden');
+      hasilWrapper.classList.remove('hidden');
+
+      // Update Satire Box
+      const satire = getSatireMeme(uang);
+      
+      // Animasi ringan ketika merender ulang meme baru
+      satireBox.classList.remove('scale-100', 'opacity-100');
+      satireBox.classList.add('scale-95', 'opacity-0');
+      
+      setTimeout(() => {
+        satireBox.className = `mt-4 p-3 md:p-4 rounded-xl text-xs md:text-sm font-bold text-center transition-all duration-300 ease-out transform scale-100 opacity-100 ${satire.cls}`;
+        satireBox.innerHTML = satire.msg;
+        satireBox.classList.remove('hidden');
+      }, 50);
+
+      // Update Data
+      document.getElementById('outPorsi').textContent = data.porsi.toLocaleString('id-ID') + ' porsi';
+
+      // Durasi
+      document.getElementById('durTahun').textContent = data.durasi.tahun;
+      document.getElementById('durBulan').textContent = data.durasi.bulan;
+      document.getElementById('durHari').textContent = data.durasi.hari;
+      document.getElementById('durJam').textContent = data.durasi.jam;
+      document.getElementById('durMenit').textContent = data.durasi.menit;
+      document.getElementById('durDetik').textContent = data.durasi.detik;
+
+      // Gaji Lokal
+      document.getElementById('gajiDki').textContent = data.gajiIndonesia.dki;
+      document.getElementById('gajiJateng').textContent = data.gajiIndonesia.jateng;
+      document.getElementById('gajiGuru').textContent = data.gajiIndonesia.guru;
+
+      // Pemain Bola Cards (Horizontal)
+      playersList.innerHTML = data.pemain
+        .map((p) => `
+          <div class="min-w-[110px] md:min-w-[140px] snap-center bg-slate-50/70 border border-slate-100/80 rounded-lg md:rounded-xl p-2 md:p-3 flex-shrink-0 relative overflow-hidden group hover:bg-slate-100/80 transition-colors">
+            <span class="absolute -right-2 -bottom-4 text-4xl md:text-5xl opacity-10 grayscale group-hover:grayscale-0 transition-all">${p.logo}</span>
+            <strong class="block text-[11px] md:text-xs text-slate-700 truncate relative z-10">${p.nama}</strong>
+            <span class="block text-[9px] md:text-[10px] text-slate-400 mb-1.5 md:mb-2 relative z-10">Rp ${formatRupiahSingkat(p.gaji)}/thn</span>
+            <div class="inline-block bg-white/80 border border-slate-200/80 text-brand-600 font-bold text-[10px] md:text-xs px-1.5 py-0.5 md:px-2 md:py-1 rounded shadow-sm relative z-10">
+              ${p.persen}
+            </div>
+          </div>
+        `)
+        .join('');
+    }
+  </script>
+</body>
+</html>
